@@ -92,8 +92,10 @@ def start_play():
 
 def stop_play():
     global t_play
+    global current_frame
     print("play off!")
     player_event.set()
+    current_frame = 0
     t_play.join()
     led_play.off()
 
