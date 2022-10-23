@@ -1,22 +1,14 @@
 from signal import pause
 from time import sleep
-from gpiozero import Button, LED
-import pyaudio
-import wave
+
 import threading
+import soundfile
 import time
 import sounddevice as sd
 import soundfile as sf
 import sys
 
-
-def int_or_str(text):
-    """Helper function for argument parsing."""
-    try:
-        return int(text)
-    except ValueError:
-        return text
-
+from gpiozero import Button, LED
 button_mode = Button(2)
 button_channel = Button(3)
 button_switch = Button(21)
@@ -33,84 +25,41 @@ rec_mode = True
 led_ch1.on()
 
 CHUNK = 1024
-FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
-
-
-
-stop_thread = threading.Event()
-is_stopped = threading.Event()
-
-t1 = None
-t_play = None
-print(stop_thread.is_set())
-
-def record(track):
-    
-    recorder = pyaudio.PyAudio()
-    stream = recorder.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
-    print("* recording")
-    frames = []
-    while not stop_thread.is_set():
-        data = stream.read(CHUNK)
-        frames.append(data)
-    # for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-    #   data = stream.read(CHUNK)
-    #   frames.append(data)
-    print("* done recording")
-    stream.stop_stream()
-    stream.close()
-    #p.terminate()
-    wf = wave.open(f'raw_{track}.wav', 'wb')
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(recorder.get_sample_size(FORMAT))
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
-
 current_frame = 0
 
+player_event = threading.Event()
+stop_thread = threading.Event()
+
+t_play = threading.Thread()
+
+
+def record(track):
+    print("todo")
+
+
 def play(channel):
-    print(f'playing {channel}')
-    event = threading.Event()
+    s_file_data, fs = soundfile.read(f'/raw/raw_{channel}')
 
-    try:
-        data, fs = sf.read('/home/pi/Documents/loopy/examples/raw_1.wav', always_2d=True)
+    def callback(outdata, frames, duration, status):
+        global current_frame
+        if status:
+            print(status)
+        chunksize = min(len(s_file_data) - current_frame, frames)
+        outdata[:chunksize] = s_file_data[current_frame:current_frame + chunksize]
+        if chunksize < frames:
+            # outdata[chunksize:] = 0
+            # raise sd.CallbackStop()
+            current_frame = 0
+        current_frame += chunksize
 
-        current_frame = 0
-
-        def callback(outdata, frames, time, status):
-            global current_frame
-            if status:
-                print(status)
-            chunksize = min(len(data) - current_frame, frames)
-            outdata[:chunksize] = data[current_frame:current_frame + chunksize]
-            if chunksize < frames:
-                outdata[chunksize:] = 0
-                if is_stopped.is_set():
-                    raise sd.CallbackStop()
-                else:
-                    current_frame = 0  # reeeewind
-            current_frame += chunksize
-        print("callback ok")
-        stream = sd.OutputStream(
-            samplerate=fs, device=None, channels=data.shape[1],
-            callback=callback, finished_callback=event.set)
-        print("stream ok")
+        stream = sd.OutputStream(samplerate=fs, channels=s_file_data.shape[1], callback=callback,
+                                 finished_callback=player_event.set)
         with stream:
-            print('Wait until playback is finished')
-            event.wait()  # Wait until playback is finished
+            player_event.wait()
+        player_event.clear()
 
-    except KeyboardInterrupt:
-        sys.exit('\nInterrupted by user')
-    except Exception as e:
-        sys.exit(type(e).__name__ + ': ' + str(e))
-    
 
 def start_rec():
     global t1
@@ -119,39 +68,44 @@ def start_rec():
     t1 = threading.Thread(target=record, args=(channel,))
     t1.start()
 
+
 def stop_rec():
     global t1
     print("rec off!")
     stop_thread.set()
     t1.join()
     led_rec.off()
-    
+
+
 def start_play():
     global t_play
     print("play on")
     t_play = threading.Thread(target=play, args=(channel,))
     t_play.start()
     led_play.on()
-    
+
+
 def stop_play():
     global t_play
     print("play off!")
-    is_stopped.set()
     t_play.join()
     led_play.off()
-    
+
+
 def big_switch_on():
     if rec_mode:
         start_rec()
     else:
         start_play()
-        
+
+
 def big_switch_off():
     if rec_mode:
         stop_rec()
     else:
         stop_play()
-    
+
+
 def switch_channel():
     global channel    
     if channel == 1:
@@ -162,6 +116,7 @@ def switch_channel():
         led_ch2.off()
         led_ch1.on()
         channel = 1
+
 
 def switch_mode():
     global rec_mode    
@@ -174,9 +129,13 @@ def switch_mode():
         led_ch1.on()
         rec_mode = True
 
+
 button_switch.when_pressed = big_switch_on
 button_switch.when_released = big_switch_off
 button_channel.when_pressed = switch_channel
 button_mode.when_pressed = switch_mode
 pause()
 
+# #
+# if __name__ == '__main__':
+#     play(1)
