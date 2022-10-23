@@ -40,7 +40,7 @@ def record(track):
 
 
 def play(channel):
-    s_file_data, fs = soundfile.read(f'/raw/raw_{channel}')
+    s_file_data, fs = soundfile.read(f'/raw/raw_{channel}.wav')
 
     def callback(outdata, frames, duration, status):
         global current_frame
