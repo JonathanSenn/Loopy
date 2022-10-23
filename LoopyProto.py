@@ -9,6 +9,7 @@ import soundfile as sf
 import sys
 
 from gpiozero import Button, LED
+
 button_mode = Button(2)
 button_channel = Button(3)
 button_switch = Button(21)
@@ -63,7 +64,6 @@ def play(channel):
         player_event.wait()
     player_event.clear()
     current_frame = 0
-
 
 
 def start_rec():
@@ -137,6 +137,17 @@ def switch_mode():
         led_ch1.on()
         rec_mode = True
 
+
+is_init = False
+
+while not is_init:
+    if button_switch.is_pressed():
+        led_rec.blink()
+        button_switch.wait_for_release()
+    else:
+        is_init = True
+
+led_rec.off()
 
 button_switch.when_pressed = big_switch_on
 button_switch.when_released = big_switch_off
