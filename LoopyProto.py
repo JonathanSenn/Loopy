@@ -141,7 +141,7 @@ def switch_mode():
 is_init = False
 
 while not is_init:
-    if button_switch.is_pressed():
+    if button_switch.is_pressed:
         led_rec.blink()
         button_switch.wait_for_release()
     else:
