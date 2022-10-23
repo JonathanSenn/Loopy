@@ -48,10 +48,6 @@ def play(channel):
         global current_frame
         if status:
             print(status)
-        if player_event.is_set():
-            current_frame = 0
-            player_event.clear()
-            raise sd.CallbackStop()
         chunksize = min(len(s_file_data) - current_frame, frames)
         outdata[:chunksize] = s_file_data[current_frame:current_frame + chunksize]
         if chunksize < frames:
@@ -64,6 +60,10 @@ def play(channel):
     stream = sd.OutputStream(samplerate=fs, channels=s_file_data.shape[1], callback=callback,
                              finished_callback=player_event.set)
     with stream:
+        if player_event.is_set():
+            current_frame = 0
+            player_event.clear()
+            raise sd.CallbackStop()
         player_event.wait()
     player_event.clear()
 
