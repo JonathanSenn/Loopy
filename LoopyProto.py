@@ -27,6 +27,7 @@ led_ch1.on()
 CHUNK = 1024
 CHANNELS = 2
 RATE = 44100
+channel = 1
 current_frame = 0
 
 player_event = threading.Event()
