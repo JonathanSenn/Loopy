@@ -96,6 +96,7 @@ def start_play():
 def stop_play():
     global t_play
     print("play off!")
+    player_event.set()
     t_play.join()
     led_play.off()
 
