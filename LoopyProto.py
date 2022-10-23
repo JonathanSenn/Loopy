@@ -20,7 +20,7 @@ led_ch2 = LED(4)
 
 all_leds = [led_rec, led_play, led_ch1, led_ch2]
 
-channel = 1
+
 rec_mode = True
 led_ch1.on()
 
@@ -40,6 +40,7 @@ def record(track):
 
 
 def play(channel):
+    player_event.clear()
     s_file_data, fs = soundfile.read(f'wav/raw_{channel}.wav')
 
     def callback(outdata, frames, duration, status):
@@ -50,6 +51,7 @@ def play(channel):
         outdata[:chunksize] = s_file_data[current_frame:current_frame + chunksize]
         if chunksize < frames:
             outdata[chunksize:] = 0
+            current_frame = 0
             raise sd.CallbackStop()
             # current_frame = 0
         current_frame += chunksize
@@ -59,6 +61,7 @@ def play(channel):
     with stream:
         player_event.wait()
     player_event.clear()
+
 
 
 def start_rec():
