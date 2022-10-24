@@ -1,3 +1,4 @@
+import queue
 from signal import pause
 from time import sleep
 
@@ -34,11 +35,26 @@ current_frame = 0
 player_event = threading.Event()
 stop_thread = threading.Event()
 
+
 t_play = threading.Thread()
+t_rec = threading.Thread()
+q = queue.Queue()
 
 
 def record(track):
-    print("todo")
+    stop_thread.clear()
+    global q
+
+    def callback(indata, frames, duration, status):
+        if status:
+            print(status, file=sys.stderr)
+        q.put(indata.copy())
+
+    with soundfile.SoundFile(f"wav/raw_{track}.wav", mode='w', samplerate=RATE, channels=2) as f_out:
+        with sd.InputStream(samplerate=44100, channels=2, callback=callback):
+            while not stop_thread.is_set():
+                f_out.write(q.get())
+            stop_thread.clear()
 
 
 def play(channel):
@@ -52,10 +68,9 @@ def play(channel):
         chunksize = min(len(s_file_data) - current_frame, frames)
         outdata[:chunksize] = s_file_data[current_frame:current_frame + chunksize]
         if chunksize < frames:
-            outdata[chunksize:] = 0
             current_frame = 0
-            raise sd.CallbackStop()
-            # current_frame = 0
+            # outdata[chunksize:] = 0
+            # raise sd.CallbackStop()
         current_frame += chunksize
 
     stream = sd.OutputStream(samplerate=fs, channels=s_file_data.shape[1], callback=callback,
@@ -67,18 +82,18 @@ def play(channel):
 
 
 def start_rec():
-    global t1
+    global t_rec
     print("rec on!")
     led_rec.on()
-    t1 = threading.Thread(target=record, args=(channel,))
-    t1.start()
+    t_rec = threading.Thread(target=record, args=(channel,))
+    t_rec.start()
 
 
 def stop_rec():
-    global t1
+    global t_rec
     print("rec off!")
     stop_thread.set()
-    t1.join()
+    t_rec.join()
     led_rec.off()
 
 

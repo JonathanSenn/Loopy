@@ -1,18 +1,39 @@
 import sounddevice as sd
-import numpy as np
-
-import soundfile
 from threading import Event
 import time
 import math
 import matplotlib.pylab as plt
 
+import queue
+import sys
+
+import soundfile
+import numpy  # Make sure NumPy is loaded before it is used in the callback
+assert numpy  # avoid "imported but unused" message (W0611)
+
 def simple_player():
-    s_file_data, fs = soundfile.read('wav-file.wav')
+    s_file_data, fs = soundfile.read('test.wav')
     sd.play(s_file_data, fs)
     Event().wait(200)
     sd.play(s_file_data, fs)
     sd.wait(5)
+
+
+
+simple_player()
+print("start rec")
+q = queue.Queue()
+
+def callback(indata, frames, time, status):
+    if status:
+        print(status, file=sys.stderr)
+    q.put(indata.copy())
+
+with soundfile.SoundFile("test.wav", mode='w', samplerate=44100, channels=2) as f_out:
+    with sd.InputStream(samplerate=44100, channels=2, callback=callback):
+        while True:
+            f_out.write(q.get())
+
 
 
 
