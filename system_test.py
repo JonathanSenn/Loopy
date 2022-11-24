@@ -54,9 +54,9 @@ button_ch1.when_pressed = button_pressed
 button_ch2.when_pressed = button_pressed
 button_ch3.when_pressed = button_pressed
 button_ch4.when_pressed = button_pressed
-button_ch1.when_released = button_pressed
-button_ch2.when_released = button_pressed
-button_ch3.when_released = button_pressed
-button_ch4.when_released = button_pressed
+button_ch1.when_released = button_released
+button_ch2.when_released = button_released
+button_ch3.when_released = button_released
+button_ch4.when_released = button_released
 
 pause()
