@@ -17,11 +17,12 @@ led_ch1 = LED(14)
 led_ch2 = LED(2)
 led_ch3 = LED(3)
 led_ch4 = LED(4)
+
 all_leds = [led_rec, led_ch1, led_ch2, led_ch3, led_ch4]
 for led in all_leds:
     led.off()
 
-button_ch1 = Button(13)
+button_ch1 = Button(19)
 button_ch2 = Button(16)
 button_ch3 = Button(26)
 button_ch4 = Button(13)
