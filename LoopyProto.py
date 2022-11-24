@@ -25,9 +25,7 @@ led_rec = LED(15)
 
 all_leds = [led_rec, led_ch1, led_ch2, led_ch3, led_ch4]
 
-
-rec_mode = True
-led_ch1.on()
+rec_mode = False
 
 CHUNK = 1024
 CHANNELS = 2
