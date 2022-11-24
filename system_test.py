@@ -30,14 +30,14 @@ button_ch4 = Button(13)
 button_switch = Button(21)
 
 
-def button_pressed(channel):
+def button_pressed(channel=None):
     print(f'Button {channel} pressed')
-    all_leds[channel].on()
+    # all_leds[channel].on()
 
 
-def button_released(channel):
+def button_released(channel=None):
     print(f'Button {channel} released')
-    all_leds[channel].off()
+    # all_leds[channel].off()
 
 
 def big_switch_on():
@@ -50,9 +50,13 @@ def big_switch_off():
 
 button_switch.when_pressed = big_switch_on
 button_switch.when_released = big_switch_off
-button_ch1.when_pressed = button_pressed(1)
-button_ch2.when_pressed = button_pressed(2)
-button_ch3.when_pressed = button_pressed(3)
-button_ch4.when_pressed = button_pressed(4)
+button_ch1.when_pressed = button_pressed
+button_ch2.when_pressed = button_pressed
+button_ch3.when_pressed = button_pressed
+button_ch4.when_pressed = button_pressed
+button_ch1.when_released = button_pressed
+button_ch2.when_released = button_pressed
+button_ch3.when_released = button_pressed
+button_ch4.when_released = button_pressed
 
 pause()
