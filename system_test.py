@@ -59,9 +59,10 @@ button_ch2.when_released = button_released
 button_ch3.when_released = button_released
 button_ch4.when_released = button_released
 
-for led in all_leds:
-    led.blink(0.1, 0.1)
-    time.sleep(2)
-    led.off()
+for i in range(5):
+    for led in all_leds:
+        led.on()
+        time.sleep(0.2)
+        led.off()
 
 pause()
