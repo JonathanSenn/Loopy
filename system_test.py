@@ -60,7 +60,7 @@ button_ch3.when_released = button_released
 button_ch4.when_released = button_released
 
 for led in all_leds:
-    led.blink()
+    led.blink(0.1, 0.1)
     time.sleep(2)
     led.off()
 
