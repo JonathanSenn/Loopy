@@ -122,12 +122,14 @@ def stop_play(ch):
 
 
 def big_switch_on():
+    print("bs")
     global channel
     if rec_mode:
         start_rec(channel)
 
 
 def big_switch_off():
+    print("bs")
     if rec_mode:
         stop_rec()
 
