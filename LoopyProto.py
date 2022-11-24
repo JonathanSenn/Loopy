@@ -35,6 +35,11 @@ RATE = 44100
 channel = 1
 current_frame = 0
 
+ch1_mode = 0
+ch2_mode = 0
+ch3_mode = 0
+ch4_mode = 0
+
 player_event = threading.Event()
 stop_thread = threading.Event()
 
@@ -153,18 +158,18 @@ def switch_mode():
         rec_mode = True
 
 
-ch1_mode = 0
-ch2_mode = 0
-ch3_mode = 0
-ch4_mode = 0
-
-
 def ch1_pressed():
     global ch1_mode
+    global channel
+    global rec_mode
+    rec_mode = False
     if ch1_mode == 0:
+        channel = 1
         ch1_mode = 1
         led_ch1.on()
     elif ch1_mode == 1:
+        rec_mode = True
+        channel = 1
         ch1_mode = 2
         led_ch1.blink(0.5, 0.5)
     else:
@@ -174,10 +179,16 @@ def ch1_pressed():
 
 def ch2_pressed():
     global ch2_mode
+    global channel
+    global rec_mode
+    rec_mode = False
     if ch2_mode == 0:
+        channel = 2
         ch2_mode = 1
         led_ch2.on()
     elif ch2_mode == 1:
+        rec_mode = True
+        channel = 2
         ch2_mode = 2
         led_ch2.blink(0.5, 0.5)
     else:
@@ -187,10 +198,16 @@ def ch2_pressed():
 
 def ch3_pressed():
     global ch3_mode
+    global channel
+    global rec_mode
+    rec_mode = False
     if ch3_mode == 0:
+        channel = 3
         ch3_mode = 1
         led_ch3.on()
     elif ch3_mode == 1:
+        rec_mode = True
+        channel = 3
         ch3_mode = 2
         led_ch3.blink(0.5, 0.5)
     else:
@@ -200,10 +217,16 @@ def ch3_pressed():
 
 def ch4_pressed():
     global ch4_mode
+    global channel
+    global rec_mode
+    rec_mode = False
     if ch4_mode == 0:
+        channel = 4
         ch4_mode = 1
         led_ch4.on()
     elif ch4_mode == 1:
+        rec_mode = True
+        channel = 4
         ch4_mode = 2
         led_ch4.blink(0.5, 0.5)
     else:
