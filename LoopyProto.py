@@ -11,16 +11,19 @@ import sys
 
 from gpiozero import Button, LED
 
-button_mode = Button(2)
-button_channel = Button(3)
+button_ch1 = Button(19)
+button_ch2 = Button(16)
+button_ch3 = Button(26)
+button_ch4 = Button(13)
 button_switch = Button(21)
 
-led_rec = LED(15)
-led_play = LED(16)
 led_ch1 = LED(14)
-led_ch2 = LED(4)
+led_ch2 = LED(2)
+led_ch3 = LED(3)
+led_ch4 = LED(4)
+led_rec = LED(15)
 
-all_leds = [led_rec, led_play, led_ch1, led_ch2]
+all_leds = [led_rec, led_ch1, led_ch2, led_ch3, led_ch4]
 
 
 rec_mode = True
@@ -81,11 +84,11 @@ def play(channel):
     current_frame = 0
 
 
-def start_rec():
+def start_rec(ch):
     global t_rec
     print("rec on!")
     led_rec.on()
-    t_rec = threading.Thread(target=record, args=(channel,))
+    t_rec = threading.Thread(target=record, args=(ch,))
     t_rec.start()
 
 
@@ -97,36 +100,33 @@ def stop_rec():
     led_rec.off()
 
 
-def start_play():
+def start_play(ch):
     global t_play
     print("play on")
     t_play = threading.Thread(target=play, args=(channel,))
     t_play.start()
-    led_play.on()
+    all_leds[ch].on()
 
 
-def stop_play():
+def stop_play(ch):
     global t_play
     global current_frame
     print("play off!")
     player_event.set()
     current_frame = 0
     t_play.join()
-    led_play.off()
+    all_leds[ch].off()
 
 
 def big_switch_on():
+    global channel
     if rec_mode:
-        start_rec()
-    else:
-        start_play()
+        start_rec(channel)
 
 
 def big_switch_off():
     if rec_mode:
         stop_rec()
-    else:
-        stop_play()
 
 
 def switch_channel():
@@ -153,6 +153,64 @@ def switch_mode():
         rec_mode = True
 
 
+ch1_mode = 0
+ch2_mode = 0
+ch3_mode = 0
+ch4_mode = 0
+
+
+def ch1_pressed():
+    global ch1_mode
+    if ch1_mode == 0:
+        ch1_mode = 1
+        led_ch1.on()
+    elif ch1_mode == 1:
+        ch1_mode = 2
+        led_ch1.blink(0.5, 0.5)
+    else:
+        ch1_mode = 0
+        led_ch1.off()
+
+
+def ch2_pressed():
+    global ch2_mode
+    if ch2_mode == 0:
+        ch2_mode = 1
+        led_ch2.on()
+    elif ch2_mode == 1:
+        ch2_mode = 2
+        led_ch2.blink(0.5, 0.5)
+    else:
+        ch2_mode = 0
+        led_ch2.off()
+
+
+def ch3_pressed():
+    global ch3_mode
+    if ch3_mode == 0:
+        ch3_mode = 1
+        led_ch3.on()
+    elif ch3_mode == 1:
+        ch3_mode = 2
+        led_ch3.blink(0.5, 0.5)
+    else:
+        ch3_mode = 0
+        led_ch3.off()
+
+
+def ch4_pressed():
+    global ch4_mode
+    if ch4_mode == 0:
+        ch4_mode = 1
+        led_ch4.on()
+    elif ch4_mode == 1:
+        ch4_mode = 2
+        led_ch4.blink(0.5, 0.5)
+    else:
+        ch4_mode = 0
+        led_ch4.off()
+
+
 is_init = False
 
 while not is_init:
@@ -166,8 +224,11 @@ led_rec.off()
 
 button_switch.when_pressed = big_switch_on
 button_switch.when_released = big_switch_off
-button_channel.when_pressed = switch_channel
-button_mode.when_pressed = switch_mode
+
+button_ch1.when_pressed = ch1_pressed
+button_ch2.when_pressed = ch2_pressed
+button_ch3.when_pressed = ch3_pressed
+button_ch4.when_pressed = ch4_pressed
 pause()
 
 # #
