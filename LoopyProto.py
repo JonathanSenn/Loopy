@@ -15,7 +15,7 @@ button_mode = Button(2)
 button_channel = Button(3)
 button_switch = Button(21)
 
-led_rec = LED(20)
+led_rec = LED(15)
 led_play = LED(16)
 led_ch1 = LED(14)
 led_ch2 = LED(4)
