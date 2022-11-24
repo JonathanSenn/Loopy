@@ -106,19 +106,17 @@ def stop_rec():
 def start_play(ch):
     global t_play
     print("play on")
-    t_play = threading.Thread(target=play, args=(channel,))
+    t_play = threading.Thread(target=play, args=(ch,))
     t_play.start()
-    all_leds[ch].on()
 
 
-def stop_play(ch):
+def stop_play():
     global t_play
     global current_frame
     print("play off!")
     player_event.set()
     current_frame = 0
     t_play.join()
-    all_leds[ch].off()
 
 
 def big_switch_on():
@@ -126,12 +124,16 @@ def big_switch_on():
     global channel
     if rec_mode:
         start_rec(channel)
+    else:
+        start_play(channel)
 
 
 def big_switch_off():
     print("bs")
     if rec_mode:
         stop_rec()
+    else:
+        stop_play()
 
 
 def switch_channel():
